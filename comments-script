@@ -1,0 +1,109 @@
+flag = false;
+$(window).load(function() {
+	$("html, body").animate({ scrollTop: $(document).height() }, 1000);
+});
+$(window).keypress(function( event ) {
+	if (event.which == 13) {
+		$("html, body").animate({ scrollTop: $(document).height() }, 1000);
+	}
+});
+
+$(document).keypress(function( event ) {
+	if (event.which == 13 && flag === false) {
+		flag = true;
+		$("#choose-user").fadeOut(200);
+		var username = $(".username-input").val();
+		$("#display-username").append("<span style='font-weight: 500'>" + username + "</span>");
+		$("#display-username").fadeIn(200);
+	}
+});
+
+$(document).ready(function () {
+	$.get( "database.txt", function( data ) {
+		$("#messages").html("");
+		data = data.split("<&p>");
+		for (x = 0; x < data.length; x++) {
+			data[x] = data[x].split("<&v>");
+			date = new Date(parseInt(data[x][2], 10));
+			hours = date.getHours()
+			if (date.getMinutes() >= 10) {
+				minutes = date.getMinutes()
+			} else {
+				minutes = "0" + date.getMinutes()
+			}
+			if (date.getSeconds() >= 10) {
+				seconds = date.getSeconds()
+			} else {
+				seconds = "0" + date.getSeconds()
+			}
+			data[x][2] = hours + ":" + minutes + ":" + seconds
+		}
+		for (x = 0; x < data.length - 1; x++) {
+			$("#messages").append("<div class='individual-message'> <span class='username'>" + data[x][0] + "</span><span class='time'>" + data[x][2] + "</span><br><span class='message'>" + data[x][1] + "</span></div>");
+		}
+	});
+});
+$(document).keypress(function( event ) {
+	if (event.which == 13) {
+		response = $(".response").val();
+		username = $(".username-input").val();
+		var dataString = 'response=' + response + '&time=' + new Date().getTime() + '&username=' + username;
+		$.ajax({
+			type: "POST",
+			url: "action.php",
+			data: dataString,
+			// this all sends the data
+			success: function() { // this function says that on success, retrieve comments from database.
+				$(".response").val("");
+				$.get( "database.txt", function( data ) {
+					$("#messages").html("");
+					data = data.split("<&p>");
+					for (x = 0; x < data.length; x++) {
+						data[x] = data[x].split("<&v>");
+						date = new Date(parseInt(data[x][2], 10));
+						hours = date.getHours()
+						if (date.getMinutes() >= 10) {
+							minutes = date.getMinutes()
+						} else {
+							minutes = "0" + date.getMinutes()
+						}
+						if (date.getSeconds() >= 10) {
+							seconds = date.getSeconds()
+						} else {
+							seconds = "0" + date.getSeconds()
+						}
+						data[x][2] = hours + ":" + minutes + ":" + seconds
+					}
+					for (x = 0; x < data.length - 1; x++) {
+						$("#messages").append("<div class='individual-message'> <span class='username'>" + data[x][0] + "</span><span class='time'>" + data[x][2] + "</span><br><span class='message'>" + data[x][1] + "</span></div>");
+					}
+				});
+			}
+		});
+	}
+});
+var questions_update = setInterval(function () {
+	$.get( "database.txt", function( data ) {
+		$("#messages").html("");
+		data = data.split("<&p>");
+		for (x = 0; x < data.length; x++) {
+			data[x] = data[x].split("<&v>");
+			date = new Date(parseInt(data[x][2], 10));
+			hours = date.getHours()
+			if (date.getMinutes() >= 10) {
+				minutes = date.getMinutes()
+			} else {
+				minutes = "0" + date.getMinutes()
+			}
+			if (date.getSeconds() >= 10) {
+				seconds = date.getSeconds()
+			} else {
+				seconds = "0" + date.getSeconds()
+			}
+			data[x][2] = hours + ":" + minutes + ":" + seconds
+		}
+		for (x = 0; x < data.length - 1; x++) {
+			$("#messages").append("<div class='individual-message'> <span class='username'>" + data[x][0] + "</span><span class='time'>" + data[x][2] + "</span><br><span class='message'>" + data[x][1] + "</span></div>");
+		}
+	});		
+}, 2000);
